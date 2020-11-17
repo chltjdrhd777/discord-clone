@@ -1,16 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import ChatContentInput from "./ChatContent";
 import ChatHeader from "./ChatHeader";
 import MessageCont from "./MessagesCont";
+import { useSelector } from "react-redux";
+import { selectApp } from "../../redux/mainReducer";
 
 function Chat() {
+  const selectedChannel = useSelector(selectApp).selectedChannelInfo;
   return (
     <ChatDiv>
       <ChatHeader />
-
-      <MessageCont />
-
+      {selectedChannel ? <MessageCont /> : <div style={{ flex: 1 }}></div>}
       <ChatContentInput />
     </ChatDiv>
   );

@@ -6,14 +6,23 @@ import PeopleAltRounded from "@material-ui/icons/PeopleAltRounded";
 import SearchRounded from "@material-ui/icons/SearchRounded";
 import HelpRoundedIcon from "@material-ui/icons/HelpRounded";
 import SendRounded from "@material-ui/icons/SendRounded";
+import { useSelector } from "react-redux";
+import { selectApp } from "../../redux/mainReducer";
 
 function ChatHeader() {
+  const selectedChannelInfo = useSelector(selectApp).selectedChannelInfo;
   return (
     <ChatHeaderDiv>
       <div className="ChatHeader_left">
         <h3>
-          <span className="Hash_Tag">#</span>
-          Test Channel name
+          {selectedChannelInfo ? (
+            <>
+              <span className="Hash_Tag">#</span>
+              {selectedChannelInfo?.channelName}
+            </>
+          ) : (
+            ""
+          )}
         </h3>
       </div>
 
@@ -44,9 +53,11 @@ const ChatHeaderDiv = styled.div`
   & .ChatHeader_left > h3 {
     display: flex;
     align-items: center;
+    color: white;
 
     & .Hash_Tag {
-      margin-right: 5px;
+      margin-right: 10px;
+      color: gray;
     }
   }
 

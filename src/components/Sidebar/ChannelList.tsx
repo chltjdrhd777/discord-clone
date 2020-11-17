@@ -1,17 +1,19 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+import { ChatList, selectedChannelInfo } from "redux/Slices/appSlice";
 import styled from "styled-components";
 
-interface ChannelProps {
-  id?: string;
-  channel?: string;
-}
+function ChannelList({ channelId, channelName }: ChatList) {
+  const dispatch = useDispatch();
+  const ChannelChangeFuc = () => {
+    dispatch(selectedChannelInfo({ channelId, channelName }));
+  };
 
-function ChannelList({ id, channel }: ChannelProps) {
   return (
-    <ChannelListDiv>
+    <ChannelListDiv onClick={ChannelChangeFuc}>
       <h4>
         <span>#</span>
-        {channel}
+        {channelName}
       </h4>
     </ChannelListDiv>
   );

@@ -1,16 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import GiftCard from "@material-ui/icons/CardGiftcard";
 import Gif from "@material-ui/icons/Gif";
 import Emoji from "@material-ui/icons/EmojiEmotions";
+import { useSelector } from "react-redux";
+import { selectApp } from "../../redux/mainReducer";
+import db from "../../firebase";
+import firebase from "firebase";
 
 function ChatContentInput() {
+  const ChannelCheck = useSelector(selectApp).selectedChannelInfo;
+
+  const [input, setInput] = useState("");
+  const inputTextFunc = (e: any) => {
+    setInput(e.target.value);
+  };
+
+  const submitHandleFunc = (e: any) => {
+    e.preventDefault();
+    db.collection("channels")
+      .doc(ChannelCheck?.channelId)
+      .collection("messages")
+      .add({
+        message: input,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    setInput("");
+  };
+
   return (
     <ChatContentInputDiv>
       <AddCircleIcon fontSize="large" />
-      <form>
-        <input type="text" placeholder="Message" />
+      <form onSubmit={submitHandleFunc}>
+        <input
+          type="text"
+          placeholder={`Message #${ChannelCheck?.channelId}`}
+          value={input}
+          onChange={inputTextFunc}
+          disabled={!ChannelCheck}
+        />
         <button type="submit">Send message</button>
       </form>
 
@@ -44,6 +73,7 @@ const ChatContentInputDiv = styled.div`
     color: wihte;
     font-size: large;
     width: 100%;
+    color: white;
   }
 
   & > form > button {

@@ -10,8 +10,37 @@ import { Avatar } from "@material-ui/core";
 import MicIcon from "@material-ui/icons/Mic";
 import HeadSet from "@material-ui/icons/Headset";
 import Setting from "@material-ui/icons/Settings";
+import { useSelector, useDispatch } from "react-redux";
+import { selectUser, selectApp } from "../../redux/mainReducer";
+import db, { auth } from "../../firebase";
+import { useEffect } from "react";
+import { setChannelList } from "redux/Slices/appSlice";
 
 function SideBar() {
+  const userInfo = useSelector(selectUser).userInfo;
+  const chatList = useSelector(selectApp).channelInfo;
+  const dispatch = useDispatch();
+
+  const handleChannelFunc = () => {
+    const channelName = prompt("Enter user name");
+
+    if (channelName) {
+      db.collection("channels").add({
+        channelName,
+      });
+    }
+  };
+
+  useEffect(() => {
+    db.collection("channels").onSnapshot((snap) => {
+      const data = snap.docs.map((doc) => ({
+        channelId: doc.id,
+        ...doc.data(),
+      }));
+      dispatch(setChannelList(data));
+    });
+  }, [dispatch]);
+
   return (
     <SidebarDiv>
       <div className="sidebar_top">
@@ -23,16 +52,23 @@ function SideBar() {
         <div className="channel_header">
           <div className="header_contents">
             <ExpandMore />
-            <h4>Text Channels</h4>
+            <h4>Channels</h4>
           </div>
 
-          <AddIcon className="sidebarHeader_AddIcon" />
+          <AddIcon
+            className="sidebarHeader_AddIcon"
+            onClick={handleChannelFunc}
+          />
         </div>
 
         <div className="sidebar_list">
-          <ChannelList channel="test1" />
-          <ChannelList channel="test2" />
-          <ChannelList channel="test3" />
+          {chatList?.map((chat) => (
+            <ChannelList
+              key={chat.channelId}
+              channelName={chat.channelName}
+              channelId={chat.channelId}
+            />
+          ))}
         </div>
       </div>
 
@@ -49,11 +85,20 @@ function SideBar() {
       </div>
 
       <div className="sidebar_profile">
-        <Avatar src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anonymous_emblem.svg/1200px-Anonymous_emblem.svg.png" />
+        <Avatar
+          src={userInfo?.photo ? userInfo.photo : ""}
+          onClick={() => {
+            auth.signOut();
+          }}
+        />
 
         <div className="profile_Info">
-          <h3>@user1</h3>
-          <p>#nickname</p>
+          <h3>{userInfo?.displayName}</h3>
+          <p>
+            {userInfo!.uid!.length > 5
+              ? `${userInfo?.uid?.substring(0, 5)}...`
+              : userInfo?.uid}
+          </p>
         </div>
 
         <div className="profile_icons">
